@@ -1,0 +1,83 @@
+# providers/host.rb
+#
+# Author: Simple Finance <ops@simple.com>
+# License: Apache License, Version 2.0
+#
+# Copyright 2013 Simple Finance Technology Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# LWRP for managing /etc/hosts.local
+
+require 'resolv'
+
+action :create do
+  new_resource.updated_by_last_action false
+  updated = false
+  ip = new_resource.ipaddr || ::Resolv.getaddress(new_resource.remote_host)
+  to_write = "#{ip} #{new_resource.remote_host} # #{new_resource.comment}"
+  if ::File.exists?('/etc/hosts.local')
+    text = ::File.read('/etc/hosts.local').split("\n")
+  else
+    text = []
+  end
+
+  # makes this idempotent
+  if !text.include?(to_write)
+    text = text.collect do |line|
+      if /#{new_resource.remote_host}/.match(line) && !/#{ip}/.match(line)
+        ::Chef::Log.info 'Replacing mismatched IP address associated with ' + new_resource.remote_host
+        updated = true
+        line.gsub(/\d+\.\d+\.\d+\.\d+/, ip)
+      else
+        line
+      end
+    end
+
+    # if true, we already made a modification and are just recommitting text
+    # else, we still need to update, but just append line we composed
+    if updated
+      ::File.open('/etc/hosts.local', 'w') {|f| f.puts text}
+    else
+      ::Chef::Log.info "Adding new host #{new_resource.remote_host} to hosts.local"
+      ::File.open('/etc/hosts.local', 'a') {|f| f.puts to_write}
+    end
+    new_resource.updated_by_last_action true
+  end
+end
+
+action :delete do
+  new_resource.updated_by_last_action false
+  updated = false
+
+  if ::File.exists?('/etc/hosts.local')
+    text = ::File.read('/etc/hosts.local').split("\n")
+  else
+    ::Chef::Log.warn 'No /etc/hosts.local file found -- bailing'
+    return
+  end
+  
+  text = text.select do |line|
+    if /#{new_resource.remote_host}/.match(line)
+      ::Chef::Log.info "Deleted /etc/hosts.local entry #{new_resource.remote_host}"
+      updated = true
+      false
+    else true end
+  end
+
+  if updated
+    ::File.open('/etc/hosts.local', 'w') {|f| f.puts text}
+    new_resource.updated_by_last_action true
+  end
+end
+

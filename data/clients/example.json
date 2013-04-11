@@ -1,0 +1,7 @@
+{
+  "id": "example",
+  "proxy_port": 8000,
+  "port": 5000,
+  "hosts": ["host.example.com"],
+  "ssl": false
+}
