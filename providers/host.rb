@@ -21,16 +21,16 @@
 
 require 'resolv'
 
+def hosts_entries
+  ::File.read('/etc/hosts').split("\n") if ::File.exists?('/etc/hosts')
+end
+
 action :create do
   new_resource.updated_by_last_action false
   updated = false
   ip = new_resource.ipaddr || Resolv.getaddress(new_resource.remote_host)
   to_write = "#{ip} #{new_resource.remote_host} # #{new_resource.comment}"
-  if ::File.exists?('/etc/hosts')
-    text = ::File.read('/etc/hosts').split("\n")
-  else
-    text = []
-  end
+  text = hosts_entries || []
 
   if !text.include?(to_write)
     text = text.collect do |line|
@@ -58,10 +58,9 @@ end
 action :delete do
   new_resource.updated_by_last_action false
   updated = false
+  text = hosts_entries
 
-  if ::File.exists?('/etc/hosts')
-    text = ::File.read('/etc/hosts').split("\n")
-  else
+  if text.nil?
     Chef::Log.warn 'No /etc/hosts file found -- bailing'
     return
   end
