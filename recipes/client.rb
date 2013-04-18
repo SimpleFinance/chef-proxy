@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Configures /etc/hosts.local to point specific traffic to a proxy
+# Configures /etc/hosts to point specific traffic to a proxy
 
 require 'resolv'
 
