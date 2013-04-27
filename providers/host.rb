@@ -60,7 +60,7 @@ action :delete do
   updated = false
   text = hosts_entries
 
-  if text.nil?
+  if text.empty?
     Chef::Log.warn 'No /etc/hosts file found -- bailing'
     return
   end
