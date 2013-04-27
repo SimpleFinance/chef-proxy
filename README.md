@@ -24,7 +24,7 @@ proxy instance via the `node[:proxy][:host]` attribute.
 
 ## Resources
 
-#### Host
+#### proxy\_host
 This resource creates, modifies, or deletes an /etc/hosts entry using either
 the :create (default) or :delete action. Includes the following parameters:
 
