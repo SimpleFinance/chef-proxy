@@ -26,27 +26,26 @@ include_recipe 'haproxy::default'
 proxies = data_bag(node[:proxy][:databag]).collect do |name|
   data_bag_item(node[:proxy][:databag], name)
 end.select do |svc|
-  unless svc['proxy_port']
-    Chef::Log.warn("#{svc['id']} has no `proxy_port`")
+  if !verify(svc)
     false
+  else
+    Chef::Log.info "Configur proxy host IP for #{svc['id']}"
+    svc['proxy_host'] = svc['proxy_host'] ? ::Resolv.getaddress(svc['proxy_host']) : '*'
+    true
   end
-  
-  unless svc['hosts'] || svc.fetch(node[:short_environment], {})['hosts']
-    Chef::Log.warn("#{svc['id']} has no hosts")
-    false
-  end
-
-  Chef::Log.info "Configuring proxy host IP for #{svc['id']}"
-  svc['proxy_host'] = svc['proxy_host'] ? ::Resolv.getaddress(svc['proxy_host']) : '*'
-  true
 end
 
-resource = resources('template[/etc/haproxy/haproxy.cfg]')
-resource.cookbook 'proxy'
-resource.variables(
-  :global => node[:proxy][:global],
-  :defaults => node[:proxy][:defaults],
-  :backend => node[:proxy][:backend],
-  :env => node[:proxy][:environment],
-  :services => proxies.sort_by {|s| s['id']} )
+template '/etc/haproxy/haproxy.cfg' do
+  owner 'root'
+  group 'root'
+  mode 00640
+  variables(
+    :global => node[:proxy][:global],
+    :defaults => node[:proxy][:defaults],
+    :backend => node[:proxy][:backend],
+    :env => node[:proxy][:environment],
+    :services => proxies.sort_by {|s| s['id']} )
+  notifies :reload, 'service[haproxy]', :delayed
+  action :create
+end
 
