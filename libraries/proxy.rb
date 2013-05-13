@@ -23,7 +23,7 @@ class Simple
   module Proxy
     
     def verify(item)
-      return check_key(item, 'proxy_port') || ip_match?(item) || check_hosts(item)
+      return check_key(item, 'proxy_port') && include_ip?(item) && check_hosts(item)
     end
 
     private
@@ -36,8 +36,9 @@ class Simple
       item['hosts'] || item.fetch(node[:short_environment], {})['hosts']
     end
 
-    def ip_match?(item)
-      item['proxy_host'] ? node[:ipaddress] == Resolv.getaddress(item['proxy_host']) : true
+    def include_ip?(item)
+      ip_addrs = node[:network][:interfaces].collect{|name,i| i['addresses']}.collect{|i| i.keys}.flatten
+      ip_addrs.include?(item['proxy_ip']) ? true : false
     end
 
   end
