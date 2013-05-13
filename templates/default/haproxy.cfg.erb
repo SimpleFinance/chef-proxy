@@ -29,11 +29,11 @@ defaults
         errorfile       503     /etc/haproxy/errors/503.http
         errorfile       504     /etc/haproxy/errors/504.http
 
-listen stats *:80
+listen stats *:<%= @defaults[:stats_port] %>
         mode http
 
 <% @services.each do |svc| %>
-frontend <%= svc['id'] %>-frontend <%= svc['proxy_host'] %>:<%= svc['proxy_port'] %>
+frontend <%= svc['id'] %>-frontend <%= svc['proxy_ip'] %>:<%= svc['proxy_port'] %>
         mode tcp
         option tcplog
         default_backend <%= svc['id'] %>-backend

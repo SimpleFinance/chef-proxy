@@ -29,7 +29,7 @@ include_recipe 'haproxy::default'
 
 proxies = data_bag(node[:proxy][:databag]).sort.collect do |name|
   item = data_bag_item(node[:proxy][:databag], name)
-  item['proxy_ip'] = svc['proxy_host'] ? Resolv.getaddress(svc['proxy_host']) : '*'
+  item['proxy_ip'] = item['proxy_host'] ? Resolv.getaddress(item['proxy_host']) : '*'
   item
 end.select do |svc|
   if !verify(svc)
