@@ -22,9 +22,10 @@
 require 'resolv'
 
 data_bag(node[:proxy][:databag]).sort.each do |client|
-  data_bag_item(node[:proxy][:databag], client)['hosts'].each do |host|
+  item = data_bag_item(node[:proxy][:databag], client)
+  item['hosts'].each do |host|
     proxy_host host do
-      ipaddr ::Resolv.getaddress(client['proxy_host'] || node[:proxy][:host])
+      ipaddr Resolv.getaddress(item['proxy_host'] || node[:proxy][:host])
       comment 'Aim at our proxy instance'
       action :create
     end
