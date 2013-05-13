@@ -21,16 +21,22 @@
 
 require 'resolv'
 
+class Chef::Recipe
+  include Simple::Proxy
+end
+
 include_recipe 'haproxy::default'
 
-proxies = data_bag(node[:proxy][:databag]).collect do |name|
-  data_bag_item(node[:proxy][:databag], name)
+proxies = data_bag(node[:proxy][:databag]).sort.collect do |name|
+  item = data_bag_item(node[:proxy][:databag], name)
+  item['proxy_ip'] = svc['proxy_host'] ? Resolv.getaddress(svc['proxy_host']) : '*'
+  item
 end.select do |svc|
   if !verify(svc)
+    Chef::Log.warn "Rejecting proxy host IP for #{svc['id']}"
     false
   else
-    Chef::Log.info "Configur proxy host IP for #{svc['id']}"
-    svc['proxy_host'] = svc['proxy_host'] ? ::Resolv.getaddress(svc['proxy_host']) : '*'
+    Chef::Log.info "Configuring proxy host IP for #{svc['id']}"
     true
   end
 end
@@ -44,7 +50,7 @@ template '/etc/haproxy/haproxy.cfg' do
     :defaults => node[:proxy][:defaults],
     :backend => node[:proxy][:backend],
     :env => node[:proxy][:environment],
-    :services => proxies.sort_by {|s| s['id']} )
+    :services => proxies )
   notifies :reload, 'service[haproxy]', :delayed
   action :create
 end
