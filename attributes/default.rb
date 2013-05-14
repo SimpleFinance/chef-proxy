@@ -35,6 +35,7 @@ default[:proxy][:defaults][:srvtimeout]    = 50000
 default[:proxy][:defaults][:stats_uri]     = '/stats'
 default[:proxy][:defaults][:stats_realm]   = 'haproxy'
 default[:proxy][:defaults][:stats_auth]    = 'admin:secret'
+default[:proxy][:defaults][:stats_port]    = 80
  
 default[:proxy][:backend][:interval]       = 2000
 default[:proxy][:backend][:rise]           = 2
