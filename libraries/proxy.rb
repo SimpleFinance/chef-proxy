@@ -39,7 +39,7 @@ class Simple
     def include_ip?(item)
       ip_addrs = node[:network][:interfaces].collect{|name,i| i['addresses']}.collect{|i| i.keys}.flatten
       ip_addrs.push '*'
-      ip_addrs.include?(item['proxy_ip']) ? true : false
+      ip_addrs.include? item['proxy_ip']
     end
 
   end
