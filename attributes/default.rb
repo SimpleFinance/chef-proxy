@@ -42,7 +42,6 @@ default[:proxy][:backend][:rise]           = 2
 default[:proxy][:backend][:fall]           = 5
 default[:proxy][:backend][:ssl]            = false
 
-# Never necessary -- use only if you want Sensu check customization!
 default[:proxy][:sensu][:handlers]         = ['default']
 default[:proxy][:sensu][:check_interval]   = 15
 default[:proxy][:sensu][:additional]       = { :occurrences => 4 }

@@ -19,8 +19,6 @@
 #
 # Use Sensu? So do we! Auto check generation
 
-include_recipe 'sensu::server'
-
 # Deploy a sensu_check per HAProxy backend
 data_bag(node[:proxy][:databag]).sort.each do |item|
   client = data_bag_item(node[:proxy][:databag], item)
