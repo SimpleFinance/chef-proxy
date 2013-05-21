@@ -22,6 +22,11 @@ Configures an instance to route traffic via HAproxy
 Configures an instance to send traffic destined for a host to go through a
 proxy instance via the `node[:proxy][:host]` attribute.
 
+#### Monitoring
+This recipe sets up Sensu checks for each data bag item (and thus, each
+client). This obviously requires Sensu, which we use, but the recipe provides a cheap
+way of shipping monitoring using already-defined data.
+
 ## Resources
 
 #### proxy\_host
