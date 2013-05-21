@@ -19,18 +19,20 @@
 #
 # Use Sensu? So do we! Auto check generation
 
+include_recipe 'sensu::server'
+
 # Deploy a sensu_check per HAProxy backend
 data_bag(node[:proxy][:databag]).sort.each do |item|
   client = data_bag_item(node[:proxy][:databag], item)
   user, pass = node[:proxy][:defaults][:stats_auth].split(':')
+  subscription = client['proxy_host'] || node[:proxy][:host]
 
   sensu_check "#{client['id']}-backend" do
     command "haproxy-backend.rb -b #{client['id']}-backend -u #{user} -p #{pass}"
-    subscribers client['proxy_host'] || node[:proxy][:host]
-    handlers node[:proxy][:sensu][:handlers] || ['default']
-    interval node[:proxy][:sensu][:check_interval] || 15
-    additional(
-      :occurrences => node[:proxy][:sensu][:occurrences] || 4 )
+    subscribers subscription
+    handlers node[:proxy][:sensu][:handlers]
+    interval node[:proxy][:sensu][:check_interval]
+    additional(node[:proxy][:sensu][:additional])
   end
 end
 
