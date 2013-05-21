@@ -26,7 +26,7 @@ data_bag(node[:proxy][:databag]).sort.each do |client|
   item['hosts'].each do |host|
     proxy_host host do
       ipaddr Resolv.getaddress(item['proxy_host'] || node[:proxy][:host])
-      comment 'Aim at our proxy instance'
+      comment client['comment'] || 'Aim at our proxy instance'
       action :create
     end
   end
