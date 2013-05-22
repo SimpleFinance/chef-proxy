@@ -22,6 +22,7 @@
 default[:proxy][:host]                     = 'localhost'
 default[:proxy][:databag]                  = 'clients'
 default[:proxy][:environment]              = 'dev'
+default[:proxy][:server]                   = false
 
 default[:proxy][:global][:user]            = 'haproxy'
 default[:proxy][:global][:group]           = 'haproxy'
