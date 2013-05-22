@@ -27,6 +27,7 @@ end
 
 include_recipe 'haproxy::default'
 
+node.override[:proxy][:server] = true
 proxies = data_bag(node[:proxy][:databag]).sort.collect do |name|
   item = data_bag_item(node[:proxy][:databag], name)
   item['proxy_ip'] = item['proxy_host'] ? Resolv.getaddress(item['proxy_host']) : '*'
