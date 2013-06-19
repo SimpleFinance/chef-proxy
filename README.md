@@ -38,6 +38,9 @@ the :create (default) or :delete action. Includes the following parameters:
 * `comment` : Comment for extra information appended to the entry (optional)
 * `action` : One of :create (default) or :delete
 
+## Questions?
+Hop on ##simple on Freenode with any questions or concerns.
+
 ## Author
 Simple Finance <ops@simple.com>
 
