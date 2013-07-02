@@ -45,6 +45,9 @@ backend <%= svc['id'] %>-backend
         <% if svc['ssl'] || @backend['ssl'] %>
         option ssl-hello-chk
         <% end %>
+        <% (svc['options'] || []).each do |opt| %>
+        <%= opt %>
+        <% end %>
         <% (svc.fetch(@env, {})['hosts'] || svc['hosts']).each do |host| %>
         server <%= host %> <%= host %>:<%= svc['endpoint_port'] || svc['port'] %> check inter <%= svc.fetch('haproxy', {})['interval'] || @backend['interval'] %> rise <%= svc.fetch('haproxy', {})['rise'] || @backend['rise'] %> fall <%= svc.fetch('haproxy', {})['fall'] || @backend['fall'] %>
         <% end %>
